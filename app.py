@@ -26,7 +26,10 @@ def after_request(response):
 @app.route("/")
 @login_required
 def index():
-    return render_template("base.html")
+    tasks = db.execute(
+        "SELECT * FROM tasks"
+    )
+    return render_template("base.html", tasks=tasks)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -69,7 +72,7 @@ def newtask():
         task = request.form.get("task")
         now = datetime.now()
         datetime_string = now.strftime("%Y-%d-%m %H:%M:%S")
-        print(user_id, task_name, reference, task, datetime_string)
+        print(task)
 
         db.execute(
             "INSERT INTO tasks (user_id, task_name, reference, task, datetime) VALUES(?, ?, ?, ?, ?)",
