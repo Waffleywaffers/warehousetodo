@@ -5,7 +5,11 @@ from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from datetime import datetime
 
+from helpers import login_required
+
 app = Flask(__name__)
+
+db = SQL("sqlite:///whtd.db")
 
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
@@ -23,7 +27,26 @@ def after_request(response):
 def index():
     return render_template("layout.html")
 
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    return render_template("login.html")
-    
+    session.clear()
+    if request.method == "POST":
+        user = db.execute(
+            "SELECT * FROM users WHERE username = ?", request.form.get("username")
+        )
+        session["user_id"] = user[0]["id"]
+
+        return render_template("base.html")
+    else:
+        return render_template("login.html")
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form.get("username")
+        db.execute(
+            "INSERT INTO users (username) VALUES(?)", username
+        )
+        return redirect("/login")
+    else:
+        return render_template("register.html")
