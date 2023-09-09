@@ -58,3 +58,28 @@ def register():
 def logout():
     session.clear()
     return redirect("/")
+
+@app.route("/newtask", methods=["GET", "POST"])
+@login_required
+def newtask():
+    if request.method == "POST":
+        user_id = session["user_id"]
+        task_name = request.form.get("task_name")
+        reference = request.form.get("reference")
+        task = request.form.get("task")
+        now = datetime.now()
+        datetime_string = now.strftime("%Y-%d-%m %H:%M:%S")
+        print(user_id, task_name, reference, task, datetime_string)
+
+        db.execute(
+            "INSERT INTO tasks (user_id, task_name, reference, task, datetime) VALUES(?, ?, ?, ?, ?)",
+            user_id,
+            task_name,
+            reference,
+            task,
+            datetime_string
+        )
+
+        return redirect("/")
+    else:
+        return render_template("newtask.html")
