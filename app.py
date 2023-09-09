@@ -24,8 +24,9 @@ def after_request(response):
     return response
 
 @app.route("/")
+@login_required
 def index():
-    return render_template("layout.html")
+    return render_template("base.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -34,9 +35,11 @@ def login():
         user = db.execute(
             "SELECT * FROM users WHERE username = ?", request.form.get("username")
         )
+        if len(user) != 1:
+            return redirect("/login")
+        
         session["user_id"] = user[0]["id"]
-
-        return render_template("base.html")
+        return redirect("/")
     else:
         return render_template("login.html")
 
@@ -50,3 +53,5 @@ def register():
         return redirect("/login")
     else:
         return render_template("register.html")
+    
+
