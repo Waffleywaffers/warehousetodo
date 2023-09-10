@@ -27,7 +27,7 @@ def after_request(response):
 @login_required
 def index():
     tasks = db.execute(
-        "SELECT * FROM tasks"
+        "SELECT * FROM tasks WHERE status = 'To do'"
     )
     return render_template("base.html", tasks=tasks)
 
@@ -151,3 +151,12 @@ def completetask():
         return redirect("/")
     else:
         return redirect("/")
+    
+
+@app.route("/completed")
+@login_required
+def completed():
+    completed_tasks = db.execute(
+        "SELECT * FROM tasks WHERE status = 'Completed'"
+    )
+    return render_template("completed.html", completed_tasks=completed_tasks)
