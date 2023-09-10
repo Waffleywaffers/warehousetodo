@@ -9,7 +9,7 @@ from helpers import login_required
 
 app = Flask(__name__)
 
-db = SQL("sqlite:///whtd.db")
+db = SQL("sqlite:///whtd2.db")
 
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
@@ -38,8 +38,10 @@ def login():
         user = db.execute(
             "SELECT * FROM users WHERE username = ?", request.form.get("username")
         )
+        print(user)
         if len(user) != 1:
-            return redirect("/login")
+            apology = "Username not found"
+            return render_template("apology.html", apology=apology)
         
         session["user_id"] = user[0]["id"]
         flash("Hi " + user[0]["username"] + "!")
@@ -51,6 +53,11 @@ def login():
 def register():
     if request.method == "POST":
         username = request.form.get("username")
+
+        if not username:
+            apology = "Please enter Username"
+            return render_template("apology.html", apology=apology)
+        
         db.execute(
             "INSERT INTO users (username) VALUES(?)", username
         )
