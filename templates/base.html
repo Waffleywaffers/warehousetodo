@@ -22,15 +22,27 @@
         <div class="col-3 bg-secondary">
             <span>{{ task.task_name }}</span><br>
             <span>{{ task.user_id }}</span>
-       </div>
+        </div>
        <div class="col-6 text-start">
           <pre style="white-space: pre-line">
             {{ task.task }}
           </pre>
        </div>
        <div class="col-3">
-          <span>{{ task.datetime }}</span>
        </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="col-3 bg-light">
+          <form action="/edittask" method="get">
+          <button type="submit" class="btn" name=task_id value="{{ task.task_id }}"><i class="bi bi-pencil-square"></i></button>
+          </form>
+        </div>
+        <div class="col-6">
+        </div>
+        <div class="col-3">
+          <span>{{ task.datetime }}</span>
+        </div>
+    </div>
     </div>
   </div>
   {% endfor %}

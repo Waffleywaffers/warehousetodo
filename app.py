@@ -72,7 +72,6 @@ def newtask():
         task = request.form.get("task")
         now = datetime.now()
         datetime_string = now.strftime("%Y-%d-%m %H:%M:%S")
-        print(task)
 
         db.execute(
             "INSERT INTO tasks (user_id, task_name, reference, task, datetime) VALUES(?, ?, ?, ?, ?)",
@@ -86,3 +85,45 @@ def newtask():
         return redirect("/")
     else:
         return render_template("newtask.html")
+    
+@app.route("/edittask", methods=["GET", "POST"])
+@login_required
+def edittask():
+    if request.method == "POST":
+        task_id = request.form.get("task_id")
+        user_id = session["user_id"]
+        now = datetime.now()
+        datetime_string = now.strftime("%Y-%d-%m %H:%M:%S")
+        task_dict = {
+                    "task_name": request.form.get("task_name"), 
+                    "reference": request.form.get("reference"), 
+                    "task": request.form.get("task")
+                    }
+
+        edittask_row = db.execute(
+            "SELECT task_name, reference, task FROM tasks WHERE task_id = ?", task_id
+        )
+        
+        edittask_dict = edittask_row[0]
+
+        for i in task_dict:
+            if task_dict.get(i) != edittask_dict.get(i):
+                db.execute(
+                    "UPDATE tasks SET ? = ? WHERE task_id = ?", i, task_dict.get(i), task_id
+                )
+        db.execute(
+            "UPDATE tasks SET datetime = ? WHERE task_id = ?", datetime_string, task_id
+        )
+
+        return redirect("/")
+
+    else:
+        task_id = request.args.get("task_id")
+        task_row = db.execute(
+            "SELECT * FROM tasks WHERE task_id = ?", task_id
+        )
+        task_name = task_row[0]["task_name"]
+        reference = task_row[0]["reference"]
+        task = task_row[0]["task"]
+        task_id = task_row[0]["task_id"]
+        return render_template("edittask.html", task_name=task_name, reference=reference, task=task, task_id=task_id)

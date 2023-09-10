@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Edit Task
+{% endblock %}
+
+{% block main %}
+<form action="/edittask" method="post">
+    <div class="container m-1 p-1 border shadow">
+        <div class="input-group m-1 px-1">
+            <label for="task_id" class="col-2 col-form-label">Task ID</label>
+            <div class="col-9 mx-1">
+            <input type="text" class="form-control" id="task_id" name="task_id" value="{{ task_id }}" readonly="readonly">
+            </div>
+        </div>
+        <div class="input-group m-1 px-1">
+            <label for="task_name" class="col-2 col-form-label">Task</label>
+            <div class="col-9 mx-1">
+            <input type="text" class="form-control" id="task_name" name="task_name" value="{{ task_name }}">
+            </div>
+        </div>
+        <div class="input-group m-1 px-1">
+            <label for="reference" class="col-2 col-form-label">Ref</label>
+            <div class="col-9 mx-1">
+            <input type="text" class="form-control" name="reference" value="{{ reference }}">
+            </div>
+        </div>
+        <div class="input-group m-1 px-1">
+            <textarea class="form-control" name="task" rows="8">{{ task }}</textarea>
+        </div>
+        <div>
+            <button class="btn btn-outline-primary" type="submit">Save Task</button>
+        </div>
+    </div>
+</form>
+
+{% endblock %}
