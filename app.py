@@ -27,7 +27,7 @@ def after_request(response):
 @login_required
 def index():
     tasks = db.execute(
-        "SELECT * FROM tasks WHERE status = 'To do'"
+        "SELECT * FROM tasks JOIN users ON id = user_id WHERE status = 'To do' ORDER BY datetime"
     )
     return render_template("base.html", tasks=tasks)
 
@@ -153,10 +153,17 @@ def completetask():
         return redirect("/")
     
 
-@app.route("/completed")
+@app.route("/completed", methods=["POST", "GET"])
 @login_required
 def completed():
-    completed_tasks = db.execute(
-        "SELECT * FROM tasks WHERE status = 'Completed'"
-    )
-    return render_template("completed.html", completed_tasks=completed_tasks)
+    if request.method == "POST":
+        task_id = request.form.get("task_id")
+        db.execute(
+            "UPDATE tasks SET status = 'To do' WHERE task_id = ?", task_id
+        )
+        return redirect("/")
+    else:    
+        completed_tasks = db.execute(
+            "SELECT * FROM tasks JOIN users ON id = user_id WHERE status = 'Completed'"
+        )
+        return render_template("completed.html", completed_tasks=completed_tasks)

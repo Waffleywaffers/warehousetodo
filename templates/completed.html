@@ -21,7 +21,7 @@
     <div class="row no-gutters">
         <div class="col-3 bg-secondary">
             <span>{{ task.task_name }}</span><br>
-            <span>{{ task.user_id }}</span>
+            <span>{{ task.username }}</span>
         </div>
        <div class="col-6 text-start">
           <pre style="white-space: pre-line">
@@ -64,8 +64,8 @@
 
 
         <div class="col-1 bg-light d-flex justify-content-end">
-          <form action="/completetask" method="post">
-          <button type="submit" class="btn m-0 p-0 d-flex flex-row-reverse" name=task_id value="{{ task.task_id }}"><i class="bi bi-clipboard-check"></i></button>
+          <form action="/completed" method="post">
+          <button type="submit" class="btn m-0 p-0 d-flex flex-row-reverse" name=task_id value="{{ task.task_id }}"><i class="bi bi-arrow-clockwise"></i></button>
           </form>
         </div>
         <div class="col-6">
