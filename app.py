@@ -42,6 +42,7 @@ def login():
             return redirect("/login")
         
         session["user_id"] = user[0]["id"]
+        flash("Hi " + user[0]["username"] + "!")
         return redirect("/")
     else:
         return render_template("login.html")
@@ -81,7 +82,7 @@ def newtask():
             task,
             datetime_string
         )
-
+        flash("New Task Added")
         return redirect("/")
     else:
         return render_template("newtask.html")
@@ -114,7 +115,7 @@ def edittask():
         db.execute(
             "UPDATE tasks SET datetime = ? WHERE task_id = ?", datetime_string, task_id
         )
-
+        flash("Task Saved")
         return redirect("/")
 
     else:
@@ -136,6 +137,7 @@ def deletetask():
         db.execute(
         "DELETE FROM tasks WHERE task_id = ?", task_id
         )
+        flash("Task Deleted")
         return redirect("/")
     else:
         return redirect("/")
@@ -148,6 +150,7 @@ def completetask():
         db.execute(
             "UPDATE tasks SET status = 'Completed' WHERE task_id = ?", task_id 
         )
+        flash("Task " + task_id + " Complete!")
         return redirect("/")
     else:
         return redirect("/")
@@ -161,6 +164,7 @@ def completed():
         db.execute(
             "UPDATE tasks SET status = 'To do' WHERE task_id = ?", task_id
         )
+        flash("Task " + task_id + " Status changed to To do")
         return redirect("/")
     else:    
         completed_tasks = db.execute(
