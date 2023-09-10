@@ -127,3 +127,27 @@ def edittask():
         task = task_row[0]["task"]
         task_id = task_row[0]["task_id"]
         return render_template("edittask.html", task_name=task_name, reference=reference, task=task, task_id=task_id)
+
+@app.route("/deletetask", methods=["POST", "GET"])
+@login_required
+def deletetask():
+    if request.method == "POST":
+        task_id = request.form.get("task_id")
+        db.execute(
+        "DELETE FROM tasks WHERE task_id = ?", task_id
+        )
+        return redirect("/")
+    else:
+        return redirect("/")
+    
+@app.route("/completetask", methods=["POST", "GET"])
+@login_required
+def completetask():
+    if request.method == "POST":
+        task_id = request.form.get("task_id")
+        db.execute(
+            "UPDATE tasks SET status = 'Completed' WHERE task_id = ?", task_id 
+        )
+        return redirect("/")
+    else:
+        return redirect("/")

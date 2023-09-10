@@ -12,7 +12,7 @@
         <span>Task {{ task.task_id }}</span>
       </div>
       <div class="col">
-        <h5 class="text-start mx-3">{{ task.reference }}</h5>
+        <h6 class="text-start mx-3">{{ task.reference }}</h6>
       </div>
       <div class="col-3">
         <span>{{ task.status }}</span>
@@ -31,19 +31,29 @@
        <div class="col-3">
        </div>
     </div>
-    <div class="row no-gutters">
-        <div class="col-3 bg-light">
+    <div class="row no-gutters p-0">
+        <div class="col-1 bg-light d-flex justify-content-start">
           <form action="/edittask" method="get">
-          <button type="submit" class="btn" name=task_id value="{{ task.task_id }}"><i class="bi bi-pencil-square"></i></button>
+          <button type="submit" class="btn m-0 p-0" name=task_id value="{{ task.task_id }}"><i class="bi bi-pencil-square"></i></button>
+          </form>
+        </div>
+        <div class="col-1 bg-light d-flex justify-content-center">
+          <form action="/deletetask" method="post">
+          <button type="submit" class="btn m-0 p-0 d-flex justify-content-center" name=task_id value="{{ task.task_id }}"><i class="bi bi-trash"></i></button>
+          </form>
+        </div>
+        <div class="col-1 bg-light d-flex justify-content-end">
+          <form action="/completetask" method="post">
+          <button type="submit" class="btn m-0 p-0 d-flex flex-row-reverse" name=task_id value="{{ task.task_id }}"><i class="bi bi-clipboard-check"></i></button>
           </form>
         </div>
         <div class="col-6">
         </div>
-        <div class="col-3">
-          <span>{{ task.datetime }}</span>
+        <div class="col-3 d-flex justify-content-end">
+          <span style="font-size: xx-small;">{{ task.datetime }}</span>
         </div>
     </div>
     </div>
   </div>
   {% endfor %}
-        {% endblock %}
+{% endblock %}
