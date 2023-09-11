@@ -5,6 +5,10 @@ from flask_session import Session
 from datetime import datetime
 import sqlite3
 from helpers import login_required, check_null, apology, now
+from pathlib import Path
+
+THIS_FOLDER = Path(__file__).parent.resolve()
+my_file = THIS_FOLDER / "whtd2.db"
 
 app = Flask(__name__)
 
@@ -26,7 +30,7 @@ def after_request(response):
 @app.route("/")
 @login_required
 def index():
-    conn = sqlite3.connect("whtd2.db")
+    conn = sqlite3.connect(my_file)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
     cur.execute(
@@ -41,7 +45,7 @@ def index():
 # Login
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    conn = sqlite3.connect("whtd2.db")
+    conn = sqlite3.connect(my_file)
     cur = conn.cursor()
     session.clear()
     if request.method == "POST":
@@ -51,7 +55,6 @@ def login():
         user = cur.fetchall()        
         print(user[0][0])
         print(type(user))
-
 
 # If username not in dict (user) then return apology
         if len(user) != 1:
@@ -69,7 +72,7 @@ def login():
 # Register
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    conn = sqlite3.connect("whtd2.db")
+    conn = sqlite3.connect(my_file)
     cur = conn.cursor()
     if request.method == "POST":
 # removing whitespeace and forcing lowercase
@@ -115,7 +118,7 @@ def newtask():
         datetime_string = now.strftime("%Y-%d-%m %H:%M:%S")
 # Some data validation
         try:
-            conn = sqlite3.connect("whtd2.db")
+            conn = sqlite3.connect(my_file)
             cur = conn.cursor()
             cur.execute(
             "INSERT INTO tasks (user_id, task_name, reference, task, datetime) VALUES(?, ?, ?, ?, ?)",
@@ -149,7 +152,7 @@ def edittask():
         reference = check_null(request.form.get("reference"))
         task = check_null(request.form.get("task"))
         try:
-            conn = sqlite3.connect("whtd2.db")
+            conn = sqlite3.connect(my_file)
             cur = conn.cursor()
             cur.execute(
                 "UPDATE tasks SET task_name=?, reference=?, task=?, datetime=? WHERE task_id=?",(task_name, reference, task, datetime_string, task_id,)
@@ -164,7 +167,7 @@ def edittask():
         return redirect("/")
 # on GET request - prefill fields with task data
     else:
-        conn = sqlite3.connect("whtd2.db")
+        conn = sqlite3.connect(my_file)
         cur = conn.cursor()
         
         task_id = request.args.get("task_id")
@@ -189,7 +192,7 @@ def edittask():
 def deletetask():
     if request.method == "POST":
         task_id = request.form.get("task_id")
-        conn = sqlite3.connect("whtd2.db")
+        conn = sqlite3.connect(my_file)
         cur = conn.cursor()
         cur.execute(
         "DELETE FROM tasks WHERE task_id = ?", (task_id,)
@@ -210,7 +213,7 @@ def completetask():
     if request.method == "POST":
         task_id = request.form.get("task_id")
         date_time = now()
-        conn = sqlite3.connect("whtd2.db")
+        conn = sqlite3.connect(my_file)
         cur = conn.cursor()
         cur.execute(
             "UPDATE tasks SET status = 'Completed', completed_datetime = ? WHERE task_id = ?", (date_time, task_id,) 
@@ -223,14 +226,14 @@ def completetask():
     else:
         return redirect("/")
     
-    
+
 # Completed tasks page
 @app.route("/completed", methods=["POST", "GET"])
 @login_required
 def completed():
     if request.method == "POST":
         task_id = request.form.get("task_id")
-        conn = sqlite3.connect("whtd2.db")
+        conn = sqlite3.connect(my_file)
         cur = conn.cursor()
         cur.execute(
             "UPDATE tasks SET status = 'To do', completed_datetime = ? WHERE task_id = ?", (None, task_id,)
@@ -241,7 +244,7 @@ def completed():
         conn.close()
         return redirect("/")
     else:
-        conn = sqlite3.connect("whtd2.db")
+        conn = sqlite3.connect(my_file)
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()    
         cur.execute(
