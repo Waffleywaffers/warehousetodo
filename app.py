@@ -1,15 +1,17 @@
 import os
 
-from cs50 import SQL
+#from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from datetime import datetime
-
+import sqlite3
 from helpers import login_required, check_null, apology, now
 
 app = Flask(__name__)
 
-db = SQL("sqlite:///whtd2.db")
+#db = SQL("sqlite:///whtd2.db")
+
+
 
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
@@ -26,34 +28,49 @@ def after_request(response):
 @app.route("/")
 @login_required
 def index():
-# db.execute returns a dict (tasks) - which is passed to index.html via jinja syntax
-    tasks = db.execute(
+    conn = sqlite3.connect("whtd2.db")
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute(
         "SELECT * FROM tasks JOIN users ON id = user_id WHERE status = 'To do' ORDER BY datetime"
     )
+    tasks = cur.fetchall()
+    cur.close()
+    conn.close()
     return render_template("index.html", tasks=tasks)
 
 # Login
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    conn = sqlite3.connect("whtd2.db")
+    cur = conn.cursor()
     session.clear()
     if request.method == "POST":
-        user = db.execute(
-            "SELECT * FROM users WHERE username = ?", request.form.get("username")
+        cur.execute(
+            "SELECT * FROM users WHERE username =?", (request.form.get("username"),)
         )
-        print(user)
+        user = cur.fetchall()        
+        print(user[0][0])
+        print(type(user))
+
 # If username not in dict (user) then return apology
         if len(user) != 1:
             return apology("Username not found")
 # Setting session cookies        
-        session["user_id"] = user[0]["id"]
-        flash("Hi " + user[0]["username"] + "!")
+        session["user_id"] = user[0][0]
+        flash("Hi " + user[0][1] + "!")
+        cur.close()
+        conn.close()
         return redirect("/")
     else:
         return render_template("login.html")
 
+
 # Register
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    conn = sqlite3.connect("whtd2.db")
+    cur = conn.cursor()
     if request.method == "POST":
 # removing whitespeace and forcing lowercase
         username = (request.form.get("username")).strip().casefold()
@@ -62,16 +79,21 @@ def register():
             return apology("Please enter Username")
 
         try:
-            db.execute(
-            "INSERT INTO users (username) VALUES(?)", username
+            cur.execute(
+            "INSERT INTO users (username) VALUES(?)", (username,)
             )
-        except ValueError:
+        except sqlite3.IntegrityError:
+            cur.close()
+            conn.close()
             return apology("Username already exists")
         
+        conn.commit()
+        cur.close()
+        conn.close()
         return redirect("/login")
     else:
         return render_template("register.html")
-
+    
 # Logout 
 @app.route("/logout")
 def logout():
@@ -91,17 +113,22 @@ def newtask():
         datetime_string = now.strftime("%Y-%d-%m %H:%M:%S")
 # Some data validation
         try:
-            db.execute(
+            conn = sqlite3.connect("whtd2.db")
+            cur = conn.cursor()
+            cur.execute(
             "INSERT INTO tasks (user_id, task_name, reference, task, datetime) VALUES(?, ?, ?, ?, ?)",
-            user_id,
+            (user_id,
             task_name,
             reference,
             task,
-            datetime_string
+            datetime_string,)
             )
-        except ValueError: 
+        except sqlite3.IntegrityError: 
             return apology("Please fill in all fields")
         
+        conn.commit()
+        cur.close()
+        conn.close()
         flash("New Task Added")
         return redirect("/")
     else:
@@ -115,42 +142,43 @@ def edittask():
         task_id = request.form.get("task_id")
         now = datetime.now()
         datetime_string = now.strftime("%Y-%d-%m %H:%M:%S")
-        task_dict = {
-                    "task_name": check_null(request.form.get("task_name")), 
-                    "reference": check_null(request.form.get("reference")), 
-                    "task": check_null(request.form.get("task"))
-                    }
+        task_name = check_null(request.form.get("task_name"))
+        reference = check_null(request.form.get("reference"))
+        task = check_null(request.form.get("task"))
+        try:
+            conn = sqlite3.connect("whtd2.db")
+            cur = conn.cursor()
+            cur.execute(
+                "UPDATE tasks SET task_name=?, reference=?, task=?, datetime=? WHERE task_id=?",(task_name, reference, task, datetime_string, task_id,)
+            )
+        except sqlite3.IntegrityError: 
+            return apology("Please fill in all fields")          
 
-        edittask_row = db.execute(
-            "SELECT task_name, reference, task FROM tasks WHERE task_id = ?", task_id
-        )
-        
-        edittask_dict = edittask_row[0]
-
-        for i in task_dict:
-            if task_dict.get(i) != edittask_dict.get(i):
-                try:
-                    db.execute(
-                        "UPDATE tasks SET ? = ? WHERE task_id = ?", i, task_dict.get(i), task_id
-                    )
-                except ValueError:
-                    return apology("Please fill in all fields")          
-        db.execute(
-            "UPDATE tasks SET datetime = ? WHERE task_id = ?", datetime_string, task_id
-        )
+        conn.commit()
+        cur.close()
+        conn.close()
         flash("Task Saved")
         return redirect("/")
 # on GET request - prefill fields with task data
     else:
+        conn = sqlite3.connect("whtd2.db")
+        cur = conn.cursor()
+        
         task_id = request.args.get("task_id")
-        task_row = db.execute(
-            "SELECT * FROM tasks WHERE task_id = ?", task_id
+        cur.execute(
+            "SELECT task_name, reference, task, task_id FROM tasks WHERE task_id = ?", (task_id,)
         )
-        task_name = task_row[0]["task_name"]
-        reference = task_row[0]["reference"]
-        task = task_row[0]["task"]
-        task_id = task_row[0]["task_id"]
+        task_row = cur.fetchall()
+        task_name = task_row[0][0]
+        reference = task_row[0][1]
+        task = task_row[0][2]
+        task_id = task_row[0][3]
+
+        cur.close()
+        conn.close()
+
         return render_template("edittask.html", task_name=task_name, reference=reference, task=task, task_id=task_id)
+
 
 # Delete Task with html modal for confirmation
 @app.route("/deletetask", methods=["POST", "GET"])
@@ -158,13 +186,20 @@ def edittask():
 def deletetask():
     if request.method == "POST":
         task_id = request.form.get("task_id")
-        db.execute(
-        "DELETE FROM tasks WHERE task_id = ?", task_id
+        conn = sqlite3.connect("whtd2.db")
+        cur = conn.cursor()
+        cur.execute(
+        "DELETE FROM tasks WHERE task_id = ?", (task_id,)
         )
+        conn.commit()
+        cur.close()
+        conn.close()
         flash("Task Deleted")
         return redirect("/")
     else:
         return redirect("/")
+    
+
 # Complete task - update status of task    
 @app.route("/completetask", methods=["POST", "GET"])
 @login_required
@@ -172,9 +207,14 @@ def completetask():
     if request.method == "POST":
         task_id = request.form.get("task_id")
         date_time = now()
-        db.execute(
-            "UPDATE tasks SET status = 'Completed', completed_datetime = ? WHERE task_id = ?", date_time, task_id, 
+        conn = sqlite3.connect("whtd2.db")
+        cur = conn.cursor()
+        cur.execute(
+            "UPDATE tasks SET status = 'Completed', completed_datetime = ? WHERE task_id = ?", (date_time, task_id,) 
         )
+        conn.commit()
+        cur.close()
+        conn.close()
         flash("Task " + task_id + " Complete!")
         return redirect("/")
     else:
@@ -186,13 +226,24 @@ def completetask():
 def completed():
     if request.method == "POST":
         task_id = request.form.get("task_id")
-        db.execute(
-            "UPDATE tasks SET status = 'To do', completed_datetime = ? WHERE task_id = ?", None, task_id
+        conn = sqlite3.connect("whtd2.db")
+        cur = conn.cursor()
+        cur.execute(
+            "UPDATE tasks SET status = 'To do', completed_datetime = ? WHERE task_id = ?", (None, task_id,)
         )
         flash("Task " + task_id + " Status changed to To do")
+        conn.commit()
+        cur.close()
+        conn.close()
         return redirect("/")
-    else:    
-        completed_tasks = db.execute(
+    else:
+        conn = sqlite3.connect("whtd2.db")
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()    
+        cur.execute(
             "SELECT * FROM tasks JOIN users ON id = user_id WHERE status = 'Completed'"
         )
+        completed_tasks = cur.fetchall()
+        cur.close()
+        conn.close()
         return render_template("completed.html", completed_tasks=completed_tasks)
