@@ -5,6 +5,7 @@ import requests
 import subprocess
 import urllib
 import uuid
+from datetime import datetime
 
 from flask import redirect, render_template, session
 from functools import wraps
@@ -21,3 +22,16 @@ def login_required(f):
             return redirect("/login")
         return f(*args, **kwargs)
     return decorated_function
+
+def check_null(string):
+    if not string:
+        return None
+    else:
+        return string
+    
+def apology(message):
+    return render_template("apology.html", message=message)
+
+def now():
+    now = datetime.now()
+    return now.strftime("%Y-%d-%m %H:%M:%S")
