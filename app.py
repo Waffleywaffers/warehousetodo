@@ -1,6 +1,5 @@
 import os
 
-#from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from datetime import datetime
@@ -9,11 +8,10 @@ from helpers import login_required, check_null, apology, now
 
 app = Flask(__name__)
 
-#db = SQL("sqlite:///whtd2.db")
-
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
+
 
 @app.after_request
 def after_request(response):
@@ -22,6 +20,8 @@ def after_request(response):
     response.headers["Expires"] = 0
     response.headers["Pragma"] = "no-cache"
     return response
+
+
 # Homepage/dashboard
 @app.route("/")
 @login_required
@@ -37,6 +37,7 @@ def index():
     conn.close()
     return render_template("index.html", tasks=tasks)
 
+
 # Login
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -50,6 +51,7 @@ def login():
         user = cur.fetchall()        
         print(user[0][0])
         print(type(user))
+
 
 # If username not in dict (user) then return apology
         if len(user) != 1:
@@ -92,11 +94,13 @@ def register():
     else:
         return render_template("register.html")
     
+    
 # Logout 
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/")
+
 
 # New task
 @app.route("/newtask", methods=["GET", "POST"])
@@ -131,6 +135,7 @@ def newtask():
         return redirect("/")
     else:
         return render_template("newtask.html")
+
 
 # Edit existing task    
 @app.route("/edittask", methods=["GET", "POST"])
@@ -217,6 +222,7 @@ def completetask():
         return redirect("/")
     else:
         return redirect("/")
+    
     
 # Completed tasks page
 @app.route("/completed", methods=["POST", "GET"])
