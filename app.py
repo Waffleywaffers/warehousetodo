@@ -33,10 +33,10 @@ def index():
     conn = sqlite3.connect(my_file)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
-    cur.execute(
+    res = cur.execute(
         "SELECT * FROM tasks JOIN users ON id = user_id WHERE status = 'To do' ORDER BY datetime"
     )
-    tasks = cur.fetchall()
+    tasks = res.fetchall()
     cur.close()
     conn.close()
     return render_template("index.html", tasks=tasks)
@@ -52,16 +52,14 @@ def login():
         cur.execute(
             "SELECT * FROM users WHERE username =?", (request.form.get("username"),)
         )
-        user = cur.fetchall()        
-        print(user[0][0])
-        print(type(user))
+        user = cur.fetchone() 
 
-# If username not in dict (user) then return apology
-        if len(user) != 1:
+# If username not in tuple (user) then return apology
+        if not user:
             return apology("Username not found")
 # Setting session cookies        
-        session["user_id"] = user[0][0]
-        flash("Hi " + user[0][1] + "!")
+        session["user_id"] = user[0]
+        flash("Hi " + user[1] + "!")
         cur.close()
         conn.close()
         return redirect("/")
@@ -236,7 +234,7 @@ def completed():
         conn = sqlite3.connect(my_file)
         cur = conn.cursor()
         cur.execute(
-            "UPDATE tasks SET status = 'To do', completed_datetime = ? WHERE task_id = ?", (None, task_id,)
+            "UPDATE tasks SET status = 'To do', completed_datetime = ? WHERE task_id = ?", (None, task_id)
         )
         flash("Task " + task_id + " Status changed to To do")
         conn.commit()
