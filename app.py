@@ -189,7 +189,7 @@ def edittask():
 @login_required
 def deletetask():
     if request.method == "POST":
-        task_id = request.form.get("task_id")
+        task_id = request.form.get("delete_task_id")
         conn = sqlite3.connect(my_file)
         cur = conn.cursor()
         cur.execute(

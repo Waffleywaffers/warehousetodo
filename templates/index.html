@@ -14,51 +14,51 @@ Base
     <div class="col">
       <h6 class="text-start mx-3">{{ task.reference }}</h6>
     </div>
-    <div class="col-3">
-      <span>{{ task.status }}</span>
+    <div class="col-3 d-flex justify-content-end">
+      <span class="pe-3">{{ task.username }} </span>
     </div>
   </div>
   <div class="row no-gutters">
-    <div class="col-3 rounded my-3" style="background-color: #3C6E71;">
+    <div class="col-3 rounded my-3" style="background-color: #3C6E71; color: #ffffff;">
       <span>{{ task.task_name }}</span><br>
-      <span>{{ task.username }}</span>
     </div>
     <div class="col-6 text-start">
       <pre style="white-space: pre-line">
             {{ task.task }}
-          </pre>
+      </pre>
     </div>
-    <div class="col-3">
+    <div class="col-3 text-end p-0">
+      <span class="badge bg-warning text-star">{{ task.status }}</span>
     </div>
   </div>
   <div class="container">
     <div class="row no-gutters p-0">
       <div class="col-1 d-flex justify-content-center rounded-start p-0 m-0">
         <form action="/edittask" method="get">
-          <button type="submit" class="btn m-0 p-0" name=task_id value="{{ task.task_id }}"><i
-              class="bi bi-pencil-square"></i></button>
+          <button type="submit" class="btn m-0 p-0" name=task_id value="{{ task.task_id }}">
+              <i class="bi bi-pencil-square"></i></button>
         </form>
       </div>
       <div class="col-1 d-flex justify-content-center px-0 m-0">
-        <button type="button" class="btn m-0 p-0" data-bs-toggle="modal" data-bs-target="#confirmdelete"><i
+        <button type="button" class="btn m-0 p-0" data-bs-toggle="modal" data-bs-target="#confirmdelete_{{ task.task_id }}"><i
             class="bi bi-trash"></i></button>
       </div>
 
       <!-- Modal -->
-      <div class="modal fade" id="confirmdelete" tabindex="-1" aria-labelledby="confirmdelete" aria-hidden="true">
+      <div class="modal fade" id="confirmdelete_{{ task.task_id }}" tabindex="-1" aria-labelledby="confirmdelete" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h1 class="modal-title fs-5" id="confirmdelete">Delete</h1>
+              <h1 class="modal-title fs-5">Delete</h1>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              Delete Task
+              Delete Task {{ task.task_id }}
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
               <form action="/deletetask" method="post">
-                <button type="submit" class="btn btn-primary" name="task_id" value=" {{ task.task_id }}">Delete</button>
+                <button type="submit" class="btn btn-primary" name="delete_task_id" value="{{ task.task_id }}">Delete</button>
               </form>
             </div>
           </div>
