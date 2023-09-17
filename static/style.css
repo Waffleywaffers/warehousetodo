@@ -10,3 +10,12 @@
 .date_time {
   font-size: xx-small;
 }
+
+.navbar {
+  background-color: #284B63;
+  color: white;
+}
+
+.nav-link {
+  color:  white;
+}
