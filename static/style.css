@@ -1,0 +1,12 @@
+.task_name_box {
+  background-color: #3C6E71; 
+  color: #ffffff;
+}
+
+.task_text {
+  white-space: pre-line;
+}
+
+.date_time {
+  font-size: xx-small;
+}

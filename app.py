@@ -16,7 +16,6 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-
 @app.after_request
 def after_request(response):
     """Ensure responses aren't cached"""
@@ -185,23 +184,21 @@ def edittask():
 
 
 # Delete Task with html modal for confirmation
-@app.route("/deletetask", methods=["POST", "GET"])
+@app.route("/deletetask", methods=["POST"])
 @login_required
 def deletetask():
-    if request.method == "POST":
-        task_id = request.form.get("delete_task_id")
-        conn = sqlite3.connect(my_file)
-        cur = conn.cursor()
-        cur.execute(
-        "DELETE FROM tasks WHERE task_id = ?", (task_id,)
-        )
-        conn.commit()
-        cur.close()
-        conn.close()
-        flash("Task Deleted")
-        return redirect("/")
-    else:
-        return redirect("/")
+    task_id = request.form.get("delete_task_id")
+    conn = sqlite3.connect(my_file)
+    cur = conn.cursor()
+    cur.execute(
+    "DELETE FROM tasks WHERE task_id = ?", (task_id,)
+    )
+    conn.commit()
+    cur.close()
+    conn.close()
+    flash("Task " + task_id + " Deleted")
+    return redirect("/")
+
     
 
 # Complete task - update status of task    
