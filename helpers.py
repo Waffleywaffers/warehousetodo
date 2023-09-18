@@ -6,16 +6,27 @@ import subprocess
 import urllib
 import uuid
 from datetime import datetime
+import sqlite3
+from pathlib import Path
+
 
 from flask import redirect, render_template, session
 from functools import wraps
 
-def login_required(f):
-    """
-    Decorate routes to require login.
+THIS_FOLDER = Path(__file__).parent.resolve()
+my_file = THIS_FOLDER / "whtd2.db"
 
-    http://flask.pocoo.org/docs/0.12/patterns/viewdecorators/
-    """
+conn = sqlite3.connect(my_file)
+conn.row_factory = sqlite3.Row
+cur = conn.cursor()
+cur.execute(
+    "SELECT * FROM admin"
+)
+admin_list = cur.fetchall()
+cur.close()
+conn.close()
+
+def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if session.get("user_id") is None:
@@ -35,3 +46,11 @@ def apology(message):
 def now():
     now = datetime.now()
     return now.strftime("%Y-%d-%m %H:%M:%S")
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get("admin") is False:
+            return apology("Requires Admin Access")
+        return f(*args, **kwargs)
+    return decorated_function

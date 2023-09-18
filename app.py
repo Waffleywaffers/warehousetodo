@@ -4,11 +4,7 @@ from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from datetime import datetime
 import sqlite3
-from helpers import login_required, check_null, apology, now
-from pathlib import Path
-
-THIS_FOLDER = Path(__file__).parent.resolve()
-my_file = THIS_FOLDER / "whtd2.db"
+from helpers import login_required, check_null, apology, now, admin_required, my_file, admin_list
 
 app = Flask(__name__)
 
@@ -52,15 +48,19 @@ def login():
             "SELECT * FROM users WHERE username =?", (request.form.get("username"),)
         )
         user = cur.fetchone() 
-
-# If username not in tuple (user) then return apology
         if not user:
-            return apology("Username not found")
-# Setting session cookies        
+            return apology("Username not found") 
+        
         session["user_id"] = user[0]
         flash("Hi " + user[1] + "!")
         cur.close()
         conn.close()
+
+        for user in admin_list:
+            if user["user_id"] == session["user_id"]:
+                session["admin"] = True
+            else:
+                session["admin"] = False
         return redirect("/")
     else:
         return render_template("login.html")
@@ -68,6 +68,7 @@ def login():
 
 # Register
 @app.route("/register", methods=["GET", "POST"])
+@admin_required
 def register():
     conn = sqlite3.connect(my_file)
     cur = conn.cursor()
