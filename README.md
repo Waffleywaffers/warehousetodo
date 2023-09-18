@@ -10,7 +10,7 @@ My day job is managing a small/medium warehouse. One of the problems I have is k
 
 The app is currently intended for users to be able to create and edit a task and for it to be displayed on a main dashboard. Once complete a warehouse staff member can tick it off and completed tasks will be removed from the active dashboard.
 
-The app was built using Flask for the backend and Bootstrap for the html and css. 
+The app was built using Flask for the backend and mostly Bootstrap for the front end. Database is handled by sqlite3 library in python.  
 
 
 
@@ -19,7 +19,8 @@ The app was built using Flask for the backend and Bootstrap for the html and css
 ## Features
 - User login
 - Dashboard for todo tasks
-- Create / Edit / Delete tasks 
+- Create / Edit / Delete tasks
+- Admin privileges (required for registering new users)
 
 
 
