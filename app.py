@@ -50,12 +50,12 @@ def login():
         user = cur.fetchone() 
         if not user:
             return apology("Username not found") 
-        
+#Set session user_id  
         session["user_id"] = user[0]
         flash("Hi " + user[1] + "!")
         cur.close()
         conn.close()
-
+#Set admin status to True if user_id is in the admin list
         for user in admin_list:
             if user["user_id"] == session["user_id"]:
                 session["admin"] = True
