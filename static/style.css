@@ -12,7 +12,7 @@
 }
 
 .navbar {
-  background-color: #632828;
+  background-color: #284B63;
   color: white;
 }
 
@@ -22,7 +22,7 @@
 
 .newtask_container {
   border-style: dashed; 
-  opacity: 0.3; 
+  opacity: 0.; 
   background-color: #D9D9D9;
 }
 
