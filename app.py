@@ -1,10 +1,8 @@
-import os
-
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from datetime import datetime
 import sqlite3
-from helpers import login_required, check_null, apology, now, admin_required, my_file, admin_list
+from helpers import login_required, check_null, apology, now, admin_required, my_file, get_admin_list
 
 app = Flask(__name__)
 
@@ -56,7 +54,7 @@ def login():
         cur.close()
         conn.close()
 #Set admin status to True if user_id is in the admin list
-        for user in admin_list:
+        for user in get_admin_list(my_file):
             if user["user_id"] == session["user_id"]:
                 session["admin"] = True
             else:
