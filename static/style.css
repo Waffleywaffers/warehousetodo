@@ -29,3 +29,8 @@
 .newtask_icon {
   font-size: 40px;
 }
+
+.login-side {
+  background-color: #bfdbf7; 
+  opacity: .5;
+}
