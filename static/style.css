@@ -31,6 +31,6 @@
 }
 
 .login-side {
-  background-color: #bfdbf7; 
-  opacity: .5;
+  background-image: linear-gradient(to left, white, #284B63);
+  opacity: 1;
 }
