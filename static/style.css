@@ -34,3 +34,8 @@
   background-image: linear-gradient(to left, white, #284B63);
   opacity: 1;
 }
+
+.apology {
+  background-image: linear-gradient(to left, white, #284B63);
+  color: black;
+}
