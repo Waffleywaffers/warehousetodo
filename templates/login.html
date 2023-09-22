@@ -7,25 +7,28 @@
 {% block main %}
 <div class="container-flex rounded shadow my-3">
         <div class="row no-gutters m-0">    
-            <div class="col-3 rounded-top bg-secondary">
+            <div class="col-0 col-lg-3 rounded-top" style="background-color: bisque;">
             </div>
-            <div class="col-9 d-flex-inline">
+            <div class="col d-flex-inline">
                 <span><i class="bi bi-box-seam" style="font-size: 100px;"></i></span>
             </div>
         </div>
         <div class="row no-gutters m-0">
-            <div class="col-3 rounded-bottom bg-secondary">
+            <div class="col-0 col-lg-3 rounded-bottom" style="background-color: bisque;">
             </div>
-            <div class="col-9 pe-5">
+            <div class="col-1 col-lg-2 p-0 m-0"></div>
+            <div class="col ps-0">
                 <form action="/login" method="post">
-                    <div class="form-floating">
-                    <input type="text" class="form-control" id="floatingUser" placeholder="Username" name="username">
-                    <label for="floatingUser">Username</label>
-                    <div class="p-3">
-                        <button class="btn btn-primary" type="submit">Log In</button>
+                    <div class="input-group my-3">  
+                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                        <input type="text" class="form-control" placeholder="Username" name="username" aria-label="Username" aria-describedby="basic-addon1">
+                    </div>
+                    <div>
+                        <button class="btn btn-primary my-3" type="submit">Log In</button>
                     </div>
                 </form>
             </div>
+            <div class="col-1 col-lg-2 p-0 m-0"></div>
         </div>
 </div>
 {% endblock %}
