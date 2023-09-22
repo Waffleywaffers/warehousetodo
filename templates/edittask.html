@@ -16,17 +16,17 @@
         <div class="input-group m-1 px-1">
             <label for="task_name" class="col-2 col-form-label">Task</label>
             <div class="col-9 mx-1">
-            <input type="text" class="form-control" id="task_name" name="task_name" value="{{ task_name }}">
+            <input type="text" class="form-control" id="task_name" name="task_name" value="{{ task_name }}" required="true">
             </div>
         </div>
         <div class="input-group m-1 px-1">
             <label for="reference" class="col-2 col-form-label">Ref</label>
             <div class="col-9 mx-1">
-            <input type="text" class="form-control" name="reference" value="{{ reference }}">
+            <input type="text" class="form-control" name="reference" value="{{ reference }}" required="true">
             </div>
         </div>
         <div class="input-group m-1 px-1">
-            <textarea class="form-control" name="task" rows="8">{{ task }}</textarea>
+            <textarea class="form-control" name="task" rows="8" required="true">{{ task }}</textarea>
         </div>
         <div>
             <button class="btn btn-outline-primary" type="submit">Save Task</button>
