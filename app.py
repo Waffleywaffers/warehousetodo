@@ -248,3 +248,10 @@ def completed():
         cur.close()
         conn.close()
         return render_template("completed.html", completed_tasks=completed_tasks)
+    
+@app.route("/test", methods = ("POST", "GET"))
+def test():
+    if request.method == "POST":
+        return redirect("/")
+    else:
+        return render_template("test.html")
