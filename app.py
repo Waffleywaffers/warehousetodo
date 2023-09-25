@@ -1,7 +1,9 @@
-from flask import Flask, flash, redirect, render_template, request, session
+from flask import Flask, flash, redirect, render_template, request, session, send_file, abort
 from flask_session import Session
 from datetime import datetime
 import sqlite3
+import json
+import csv
 from helpers import login_required, check_null, apology, now, admin_required, my_file, get_admin_list
 
 app = Flask(__name__)
@@ -249,9 +251,25 @@ def completed():
         conn.close()
         return render_template("completed.html", completed_tasks=completed_tasks)
     
-@app.route("/test", methods = ("POST", "GET"))
+@app.route("/test", methods=("POST", "GET"))
 def test():
     if request.method == "POST":
-        return redirect("/")
+        global item_list
+        item_list = json.loads(request.form.get("serv_submit_data"))
+        return render_template("test.html", item_list=item_list)
     else:
         return render_template("test.html")
+
+@app.route("/downloaditemlist")
+def downloaditemlist():
+    with open("static/item_list/itemlist.csv", "w") as csvfile:
+        field_names = ["name", "qty"]
+        writer = csv.DictWriter(csvfile, fieldnames=field_names)
+        writer.writeheader()
+        writer.writerows(item_list)
+    try:
+        return send_file(
+            "static/item_list/itemlist.csv", as_attachment=True
+        )
+    except FileNotFoundError:
+        abort(404)

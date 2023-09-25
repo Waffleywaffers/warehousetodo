@@ -12,7 +12,7 @@
     <title>test</title>
     <script>
         var items = [];
-        var arrNames = [];
+        var arrNames = new Set();
         document.addEventListener('DOMContentLoaded', function() {
             const table = document.getElementById("table");
             table.oldHTML = table.innerHTML;
@@ -28,7 +28,7 @@
                     }
                 };
 
-                if (!arrNames.includes(input_name)) {
+                if (!arrNames.has(input_name)) {
                     let item = {
                         "name": input_name,
                         "qty": input_qty
@@ -36,7 +36,7 @@
                     items.push(item); 
                 }
 
-                arrNames.push(input_name)        
+                arrNames.add(input_name)        
 
                 table.innerHTML = table.oldHTML;
                 for (item of items) {
@@ -51,28 +51,12 @@
 
                 var data = JSON.stringify(items);
 
+                var data_to_server = document.querySelector("#serv_submit_data");
+                data_to_server.value = data;
+
                 event.preventDefault();
             }
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const serv_btn = document.querySelector('#serv_submit');
-            serv_btn.addEventListener('click', function () {
-                fetch('/test', {
-                    method: 'post',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(items)
-                }).then(function (response) {
-                    return response.text();    
-                }).then(function (text) {
-                    console.log(text);
-                }).catch(function (error) {
-                    console.log(error);
-                })   
-            })
-        });        
+        });     
 
     </script>
 </head>
@@ -85,18 +69,34 @@
     </form>
 
     <table id="table">
-        <thead>
+        <caption>Items Counted</caption>
             <th>item</th>
             <th>qty</th>
+    </table>
+
+    <form action="/test" method="post">
+        <input type="hidden" name="serv_submit_data" id="serv_submit_data">
+        <button type="submit" id="serv_submit">Server Submit</button>
+    </form>    
+
+    {% if item_list %}
+    <table>
+        <thead>
+            <th>Name</th>
+            <th>Qty</th>
         </thead>
-        <tbody id="tablebody">
+        <tbody>
+ 
+            {% for item in item_list %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.qty }}</td>
+                <tr>
+            {% endfor %}
         </tbody>
     </table>
 
-    
-    <button id="serv_submit">Server Submit</button>
-
-
+    <a href="/downloaditemlist">download</a>
+    {% endif %}
 </body>
 </html>
-
