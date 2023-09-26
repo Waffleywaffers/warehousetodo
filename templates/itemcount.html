@@ -66,23 +66,23 @@
 {% block main %}
 
 <div class="container border rounded shadow my-3 p-3">
-    <div class="row">
-        <div class="col-6">
+    <div class="row p-3">
+        <div class="col-12 col-lg-6">
             <form>
-            <div class="row">           
-                <div class="col">
+            <div class="row px-0 mx-0">           
+                <div class="col-12 col-md-6">
                     <label for="item" class="form-label">Item</label>
                     <input type="text" class="form-control" id="item" name="item" autofocus>
                 </div>
-                <div class="col-2">
+                <div class="col-6 col-md-2">
                     <label for="qty" class="form-label">Qty</label>
                     <input type="number" class="form-control" id="qty" name="qty" value=1>
                 </div>
-                <div class="col-2">
+                <div class="col-6 col-md-2">
                     <label for="loc" class="form-label">Loc</label>
                     <input type="text" class="form-control" id="loc" name="loc">
                 </div>
-                <div class="col-2">
+                <div class="col-12 col-md-2">
                     <div class="m-2 p-2"></div>
                     <input type="submit" class="btn btn-outline-primary">
                 </div>
@@ -99,10 +99,11 @@
                     {% if item_list %}
                     <a href="/downloaditemlist" class="btn btn-outline-primary">Download spreadsheet</a>
                     {% endif %}
+
                 </div>                   
             </div>
         </div>
-        <div class="col-6">
+        <div class="col-12 col-lg-6">
             <table class="table"><h3>Items counted</h3>
                 <thead>
                     <tr>
