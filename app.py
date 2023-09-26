@@ -255,21 +255,47 @@ def completed():
 def test():
     if request.method == "POST":
         global item_list
-        item_list = json.loads(request.form.get("serv_submit_data"))
-        return render_template("test.html", item_list=item_list)
+        data = request.form.get("serv_submit_data")
+        if not data:
+            return apology("Please enter items")
+        item_list = json.loads(data)
+        if item_list:
+            return render_template("test.html", item_list=item_list)
+        else:
+            return apology("Something went wrong")
     else:
         return render_template("test.html")
 
 @app.route("/downloaditemlist")
 def downloaditemlist():
-    with open("static/item_list/itemlist.csv", "w") as csvfile:
-        field_names = ["name", "qty"]
-        writer = csv.DictWriter(csvfile, fieldnames=field_names)
-        writer.writeheader()
-        writer.writerows(item_list)
-    try:
-        return send_file(
-            "static/item_list/itemlist.csv", as_attachment=True
-        )
-    except FileNotFoundError:
-        abort(404)
+    if item_list:
+        with open("static/item_list/itemlist.csv", "w") as csvfile:
+            field_names = ["name", "qty", "loc"]
+            writer = csv.DictWriter(csvfile, fieldnames=field_names)
+            writer.writeheader()
+            writer.writerows(item_list)
+        try:
+            return send_file(
+                "static/item_list/itemlist.csv", as_attachment=True
+            )
+        except FileNotFoundError:
+            abort(404)
+    else:
+        return apology("File not found")
+    
+@app.route("/itemcount", methods=("POST", "GET"))
+@login_required
+def itemcount():
+    if request.method == "POST":
+        global item_list
+        data = request.form.get("serv_submit_data")
+        if not data:
+            return apology("Please enter items")
+        
+        item_list = json.loads(data)
+        if item_list:
+            return render_template("itemcount.html", item_list=item_list)
+        else:
+            return apology("Something went wrong")
+    else:
+        return render_template("itemcount.html")
