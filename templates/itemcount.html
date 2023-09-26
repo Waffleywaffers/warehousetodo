@@ -55,6 +55,10 @@
             var data_to_server = document.querySelector("#serv_submit_data");
             data_to_server.value = data;
 
+            document.querySelector("#item").value = "";
+            
+            document.getElementById("item").focus();
+
             event.preventDefault();
         }
     });     
@@ -72,15 +76,15 @@
             <div class="row px-0 mx-0">           
                 <div class="col-12 col-md-6">
                     <label for="item" class="form-label">Item</label>
-                    <input type="text" class="form-control" id="item" name="item" autofocus>
+                    <input type="text" class="form-control" id="item" name="item" autofocus required>
                 </div>
                 <div class="col-6 col-md-2">
                     <label for="qty" class="form-label">Qty</label>
-                    <input type="number" class="form-control" id="qty" name="qty" value=1>
+                    <input type="number" class="form-control" id="qty" name="qty" value=1 required>
                 </div>
                 <div class="col-6 col-md-2">
                     <label for="loc" class="form-label">Loc</label>
-                    <input type="text" class="form-control" id="loc" name="loc">
+                    <input type="text" class="form-control" id="loc" name="loc" required>
                 </div>
                 <div class="col-12 col-md-2">
                     <div class="m-2 p-2"></div>
