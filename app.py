@@ -4,9 +4,18 @@ from datetime import datetime
 import sqlite3
 import json
 import csv
+import os
+from werkzeug.utils import secure_filename
 from helpers import login_required, check_null, apology, now, admin_required, my_file, get_admin_list
 
+
+
 app = Flask(__name__)
+
+UPLOAD_FOLDER = 'static/pronto_list/'
+ALLOWED_EXTENSIONS = {"csv"}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
@@ -299,3 +308,64 @@ def itemcount():
             return apology("Something went wrong")
     else:
         return render_template("itemcount.html")
+
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/upload_pronto', methods=['GET', 'POST'])
+def upload_file():
+    global full_item_list
+    full_item_list = {}
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        filename = secure_filename(file.filename)
+        # If the user does not select a file, the browser submits an
+        # empty file without a filename.
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if allowed_file(file.filename) == False:
+            flash('File type not allowed')
+            return redirect(request.url)
+        if file:
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+
+        with open(filepath, newline="") as csvfile:
+            global report_list 
+            report_list= []
+            not_counted = []
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                full_item_list[row["Item Code"]] = row
+            for line in item_list:
+                item_name = line["name"]
+                try:
+                    pronto = full_item_list[item_name]
+                except KeyError:
+                    pronto = {}
+                    not_counted.append(item_name)
+                if pronto != {}:
+                    item = {
+                        "whse": pronto["Whse"],
+                        "loc": line["loc"],
+                        "name": item_name,
+                        "desc": pronto["Item Description"],
+                        "pronto_qty": round(float(pronto["On Hand"])),
+                        "item_count": line["qty"],
+                        "track": (int(line["qty"]) - round(float(pronto["On Hand"])))
+                    }
+                    report_list.append(item)
+
+
+
+            return render_template("itemcount.html", filename=filename, report_list=report_list, not_counted=not_counted)
+    return render_template("itemcount.html")
