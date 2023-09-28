@@ -92,7 +92,7 @@
                 </div>
                 <div class="col-12 col-md-2">
                     <div class="m-2 p-2"></div>
-                    <input type="submit" class="btn btn-outline-primary">
+                    <input type="submit" class="btn btn-outline-primary" value="Add Item">
                 </div>
             </form>
             <div class="row px-0 mx-0 my-1">
@@ -112,43 +112,31 @@
                     <button type="submit" id="serv_submit" class="btn btn-outline-primary">Submit Item Count</button>
                 </form>
             </div>
-            <form action="/upload_pronto" method="post" enctype="multipart/form-data">
+                <form action="/upload_pronto" method="post" enctype="multipart/form-data">
                 <div class="row px-0 mx-0 justify-content-center">         
-                    <div class="col-6 mb-3">
+                    <div class="col-12 col-md-6 mb-3">
                         <label for="formFile" class="form-label">Upload Pronto Item List</label>
-                        <input class="form-control" type="file" id="formFile" name="file">
-                    </div>
-                    <div class="col-2">
+                        <input class="form-control" type="file" id="formFile" name="file" required>
+                    </div>              
+                </div>
+                {% if item_list %}
+                <div class="row justify-content-center"> 
+                    <div class="col">                
                         <div class="my-2 py-2"></div>
-                        <button type="submit" class="btn btn-outline-primary"><i class="bi bi-upload"></i></button>
+                        <button type="submit" class="btn btn-outline-primary">Generate Report <i class="bi bi-upload"></i></button>
                     </div>
-                    
-                    <div class="col my-2 pt-4">
-                            {% if filename %}
-
-                            <span class="text-success"> {{ filename }} <i class="bi bi-check-lg px-1"></i></span>
-
-                            {% else %}
-
-                            <span class="text-danger"> No file <i class="bi bi-x-square px-1"></i></i> </span>
-
-                            {% endif%}
-                    </div>
-                                  
                 </div>
-            </form>
-        </div>
-            <div class="row my-3">
-                <div class="col-6">
-
-                </div>
-                <div class="col-6">
-                    {% if item_list %}
-                    <a href="/downloaditemlist" class="btn btn-outline-primary">Download spreadsheet</a>
+                {% endif %} 
+                </form>
+            <div class="row px-0 mx-0">
+                <div class="col">
+                    {% if report_list %}
+                    <a href="/downloadreport" class="btn btn-outline-primary">Download Report</a>
                     {% endif %}
-                </div>                   
+                </div>
             </div>
         </div>
+    </div>
         <div class="col-12 col-lg-6">
             {% if item_list %}
             <table class="table"><h3>Item Count Submitted</h3>
@@ -171,7 +159,7 @@
             </table>
 
             {% else %}
-            <table class="table"><h3>Items counted</h3>
+            <table class="table"><h3>Item Count</h3>
                 <thead>
                     <tr>
                         <th scope="col">Item</th>

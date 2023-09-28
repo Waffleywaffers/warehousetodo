@@ -299,7 +299,8 @@ def itemcount():
         global item_list
         data = request.form.get("serv_submit_data")
         if not data:
-            return apology("Please enter items")
+            flash("Please Add items")
+            return render_template("itemcount.html", report_list=report_list)
         
         item_list = json.loads(data)
         if item_list:
@@ -319,6 +320,9 @@ def allowed_file(filename):
 def upload_file():
     global full_item_list
     full_item_list = {}
+    global report_list
+    report_list = []
+
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -330,22 +334,24 @@ def upload_file():
         # empty file without a filename.
         if file.filename == '':
             flash('No selected file')
-            return redirect(request.url)
+            return render_template("itemcount.html", item_list=item_list)
         if allowed_file(file.filename) == False:
             flash('File type not allowed')
-            return redirect(request.url)
+            return render_template("itemcount.html", item_list=item_list)
         if file:
             filename = secure_filename(file.filename)
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
 
         with open(filepath, newline="") as csvfile:
-            global report_list 
-            report_list= []
+            
             not_counted = []
             reader = csv.DictReader(csvfile)
+            
+
             for row in reader:
                 full_item_list[row["Item Code"]] = row
+
             for line in item_list:
                 item_name = line["name"]
                 try:
@@ -353,6 +359,7 @@ def upload_file():
                 except KeyError:
                     pronto = {}
                     not_counted.append(item_name)
+
                 if pronto != {}:
                     item = {
                         "whse": pronto["Whse"],
@@ -362,10 +369,26 @@ def upload_file():
                         "pronto_qty": round(float(pronto["On Hand"])),
                         "item_count": line["qty"],
                         "track": (int(line["qty"]) - round(float(pronto["On Hand"])))
-                    }
-                    report_list.append(item)
-
-
+                }
+                report_list.append(item)
+            print(report_list)
 
             return render_template("itemcount.html", filename=filename, report_list=report_list, not_counted=not_counted)
     return render_template("itemcount.html")
+
+@app.route("/downloadreport", methods=("POST", "GET"))
+def downloadreport():
+    if report_list:
+        with open("static/count_report/count_report.csv", "w") as csvfile:
+            field_names = ["whse", "loc", "name", "desc", "pronto_qty", "item_count", "track"]
+            writer = csv.DictWriter(csvfile, fieldnames=field_names)
+            writer.writeheader()
+            writer.writerows(report_list)
+        try:
+            return send_file(
+                "static/count_report/count_report.csv", as_attachment=True
+            )
+        except FileNotFoundError:
+            abort(404)
+    else:
+        return apology("File not found")
