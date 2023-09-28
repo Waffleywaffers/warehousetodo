@@ -369,9 +369,8 @@ def upload_file():
                         "pronto_qty": round(float(pronto["On Hand"])),
                         "item_count": line["qty"],
                         "track": (int(line["qty"]) - round(float(pronto["On Hand"])))
-                }
-                report_list.append(item)
-            print(report_list)
+                    }
+                    report_list.append(item)
 
             return render_template("itemcount.html", filename=filename, report_list=report_list, not_counted=not_counted)
     return render_template("itemcount.html")
