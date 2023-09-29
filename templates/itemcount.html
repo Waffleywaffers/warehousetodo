@@ -13,14 +13,35 @@
         const table = document.getElementById("table");
         table.oldHTML = table.innerHTML;
 
+        const likelyLGToggle = document.querySelector("#likelyLG")
+
+        likelyLGToggle.addEventListener("change", () => {
+            if (likelyLGToggle.checked) {
+                likelyLGToggle.value = "true";
+            } else {
+                likelyLGToggle.value = "false";
+            }
+        });
+
         document.querySelector('form').onsubmit = () => {
-            input_name = document.querySelector('#item').value;
-            input_qty = Number(document.querySelector('#qty').value);
-            input_loc = document.querySelector("#loc").value;
+            var input_name = document.querySelector('#item').value;
+            var input_qty = Number(document.querySelector('#qty').value);
+            var input_loc = document.querySelector("#loc").value;
 
             document.querySelector("#last_item").value = input_name;
             document.querySelector("#last_qty").value = input_qty;
             document.querySelector("#last_loc").value = input_loc;
+
+            console.log(likelyLGToggle.value);
+
+            var prefix = "LG";
+
+            if (likelyLGToggle.value == "true") {
+                input_name = prefix.concat(input_name);
+            };
+
+            console.log(input_name)
+
 
             for (i in items) {
                 if (items[i].name === input_name) {
@@ -76,35 +97,44 @@
 {% block main %}
 
 <div class="container border rounded shadow my-3 p-3">
-    <div class="row p-3">
-        <div class="col-12 col-lg-6">
+    <div class="row">
+        <div class="col-12 col-lg-6 mx-0">
             <form>
-                <div class="row px-0 mx-0">           
-                <div class="col-12 col-md-6">
-                    <label for="item" class="form-label">Item</label>
-                    <input type="text" class="form-control" id="item" name="item" autofocus required>
+                <div class="row px-0 mx-0">
+                    <div class="col text-start">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="likelyLG" value="false">
+                            <label class="form-check-label" for="likelyLG">Prefix LG</label>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-6 col-md-2">
-                    <label for="qty" class="form-label">Qty</label>
+                <div class="row px-0 mx-0">           
+                <div class="col-12 col-lg-5">
+                    <label for="item" class="form-label">Item</label>
+                    <input type="text" class="form-control" id="item" name="item" required>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <label for="qty" class="form-label ">Qty</label>
                     <input type="number" class="form-control" id="qty" name="qty" value=1 required>
                 </div>
-                <div class="col-6 col-md-2">
+                <div class="col-6 col-lg-2">
                     <label for="loc" class="form-label">Loc</label>
                     <input type="number" class="form-control" id="loc" name="loc" required>
                 </div>
-                <div class="col-12 col-md-2">
-                    <div class="m-2 p-2"></div>
+                <div class="col-12 col-lg-3 mx-0 px-0 pt-3">
+                    <div class="my-2 mx-0 px-0 py-2">
                     <input type="submit" class="btn btn-outline-primary" value="Add Item">
+                    </div>
                 </div>
             </form>
             <div class="row px-0 mx-0 my-1">
-                <div class="col-12 col-md-6 my-2">
+                <div class="col-12 col-lg-5 my-2">
                     <input type="text" class="form-control" id="last_item" disabled>
                 </div>
-                <div class="col-6 col-md-2 my-2">
+                <div class="col-6 col-lg-2 my-2">
                     <input type="number" class="form-control" id="last_qty" disabled>
                 </div>
-                <div class="col-6 col-md-2 my-2">
+                <div class="col-6 col-lg-2 my-2">
                     <input type="number" class="form-control" id="last_loc" disabled>
                 </div>
             </div>
@@ -139,7 +169,7 @@
             </div>
         </div>
     </div>
-        <div class="col-12 col-lg-6">
+        <div class="col-12 col-lg-6 mx-0 px-1">
             {% if item_list %}
             <table class="table"><h3>Item Count Submitted</h3>
                 <thead>
