@@ -28,20 +28,14 @@
             var input_qty = Number(document.querySelector('#qty').value);
             var input_loc = document.querySelector("#loc").value;
 
-            document.querySelector("#last_item").value = input_name;
-            document.querySelector("#last_qty").value = input_qty;
-            document.querySelector("#last_loc").value = input_loc;
-
-            console.log(likelyLGToggle.value);
-
             var prefix = "LG";
-
             if (likelyLGToggle.value == "true") {
                 input_name = prefix.concat(input_name);
             };
 
-            console.log(input_name)
-
+            document.querySelector("#last_item").value = input_name;
+            document.querySelector("#last_qty").value = input_qty;
+            document.querySelector("#last_loc").value = input_loc;
 
             for (i in items) {
                 if (items[i].name === input_name) {
@@ -154,7 +148,7 @@
                 {% if item_list %}
                 <div class="row justify-content-center"> 
                     <div class="col">                
-                        <div class="my-2 py-2"></div>
+                        <div class="my-0 py-0"></div>
                         <button type="submit" class="btn btn-outline-primary">Generate Report <i class="bi bi-upload"></i></button>
                     </div>
                 </div>
