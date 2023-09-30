@@ -276,6 +276,7 @@ def test():
         return render_template("test.html")
 
 @app.route("/downloaditemlist")
+@login_required
 def downloaditemlist():
     if item_list:
         with open("static/item_list/itemlist.csv", "w") as csvfile:
@@ -317,6 +318,7 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/upload_pronto', methods=['GET', 'POST'])
+@login_required
 def upload_file():
     global full_item_list
     full_item_list = {}
@@ -343,6 +345,13 @@ def upload_file():
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
 
+        apn_list = {}
+
+        with open("static/apn_list/apn_list.csv", newline="") as apn_file:
+            apn_reader = csv.DictReader(apn_file)
+            for row in apn_reader:
+                apn_list[row["apn"]] = row["item"]
+        
         with open(filepath, newline="") as csvfile:
             
             not_counted = []
@@ -350,32 +359,48 @@ def upload_file():
             
 
             for row in reader:
-                full_item_list[row["Item Code"]] = row
-
+                try:
+                    full_item_list[row["Item Code"]] = row
+                except KeyError:
+                    flash("Pronto upload not formatted correctly")
+                    return render_template("itemcount.html", item_list=item_list)
+                
             for line in item_list:
                 item_name = line["name"]
                 try:
                     pronto = full_item_list[item_name]
                 except KeyError:
                     pronto = {}
-                    not_counted.append(item_name)
+
+                if pronto == {}:
+                    try:
+                        item_name = apn_list[item_name]
+                        pronto = full_item_list[item_name]
+                    except KeyError:
+                        pronto = {}
+                        not_counted.append(item_name)
 
                 if pronto != {}:
-                    item = {
-                        "whse": pronto["Whse"],
-                        "loc": line["loc"],
-                        "name": item_name,
-                        "desc": pronto["Item Description"],
-                        "pronto_qty": round(float(pronto["On Hand"])),
-                        "item_count": line["qty"],
-                        "track": (int(line["qty"]) - round(float(pronto["On Hand"])))
-                    }
-                    report_list.append(item)
+                    try:
+                        item = {
+                            "whse": pronto["Whse"],
+                            "loc": line["loc"],
+                            "name": item_name,
+                            "desc": pronto["Item Description"],
+                            "pronto_qty": round(float(pronto["On Hand"])),
+                            "item_count": line["qty"],
+                            "track": (int(line["qty"]) - round(float(pronto["On Hand"])))
+                        }
+                        report_list.append(item)
+                    except KeyError:
+                        flash("Something went wrong")
+                        return render_template("itemcount.html", item_list=item_list)
 
             return render_template("itemcount.html", filename=filename, report_list=report_list, not_counted=not_counted)
     return render_template("itemcount.html")
 
 @app.route("/downloadreport", methods=("POST", "GET"))
+@login_required
 def downloadreport():
     if report_list:
         with open("static/count_report/count_report.csv", "w") as csvfile:
