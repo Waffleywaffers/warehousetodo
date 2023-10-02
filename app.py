@@ -7,13 +7,13 @@ import csv
 import os
 from werkzeug.utils import secure_filename
 from helpers import login_required, check_null, apology, now, admin_required, my_file, get_admin_list
-
+import pandas as pd
 
 
 app = Flask(__name__)
 
 UPLOAD_FOLDER = 'static/pronto_list/'
-ALLOWED_EXTENSIONS = {"csv"}
+ALLOWED_EXTENSIONS = {"ods"}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -341,7 +341,7 @@ def upload_file():
             flash('File type not allowed')
             return render_template("itemcount.html", item_list=item_list)
         if file:
-            filename = secure_filename(file.filename)
+            filename = "pronto_list.ods"
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
 
@@ -351,8 +351,21 @@ def upload_file():
             apn_reader = csv.DictReader(apn_file)
             for row in apn_reader:
                 apn_list[row["apn"]] = row["item"]
+
+        filetype = filename.rsplit('.', 1)[1].lower()
+        print(filetype)
+        name_of_file = filename.rsplit('.', 1)[0].lower()
+        print(name_of_file)
         
-        with open(filepath, newline="") as csvfile:
+        df = pd.read_excel(filepath)
+        csvname = name_of_file + ".csv"
+        csvfilepath = os.path.join(app.config['UPLOAD_FOLDER'], csvname)
+        df.to_csv(csvfilepath)
+
+        print(csvname)
+        print(csvfilepath)
+
+        with open(csvfilepath, newline="") as csvfile:
             
             not_counted = []
             reader = csv.DictReader(csvfile)
